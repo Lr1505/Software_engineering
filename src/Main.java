@@ -56,9 +56,23 @@ public class Main {
                 case 4:
                     System.out.print("Enter the first word: ");
                     word1 = scanner.nextLine();
-                    System.out.print("Enter the second word: ");
-                    word2 = scanner.nextLine();
-                    String shortestPath = Graph.calcShortestPath(word1, word2, graph);
+                    System.out.print("Enter the second word (or press Enter to calculate paths from the first word to all others): ");
+                    String input = scanner.nextLine();
+                    String shortestPath;
+
+                    if (input.isEmpty()) {
+                        // 用户只输入了一个单词，调用新的 calcShortestPathSingleWord 方法
+                        shortestPath = Graph.calcShortestPathSingleWord(word1, graph);
+                    } else {
+                        word2 = input;
+                        // 用户输入了两个单词，调用现有的 calcShortestPath 方法
+                        shortestPath = Graph.calcShortestPath(word1, word2, graph);
+                        String dotPath = "shortest_path.dot";
+                        String imagePath = "shortest_path.png";
+                        Graph.generateImage(dotPath, imagePath);
+
+                    }
+
                     System.out.println(shortestPath);
                     break;
                 case 5:
@@ -83,142 +97,164 @@ public class Main {
 
 
 class Graph {
-        public static Map<String, Map<String, Integer>> buildGraph(String filePath) {
-            Map<String, Map<String, Integer>> graph = new HashMap<>();
-            try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-                String line, str = "";
-                while ((line = br.readLine()) != null) {
-                    line = line.replaceAll("[^a-zA-Z\\s]", " "); // 去除标点符号
-                    line = line.toLowerCase(); // 转换为小写
-                    str = str + line;
-                }
-                //System.out.println(str);
-                String[] words = str.split("\\s+"); // 拆分成单词
-                for (int i = 0; i < words.length - 1; i++) {
-                    String currentWord = words[i];
-                    String nextWord = words[i + 1];
-                    if (!graph.containsKey(currentWord)) {
-                        graph.put(currentWord, new HashMap<>());
-                    }
-                    Map<String, Integer> neighbors = graph.get(currentWord);
-                    neighbors.put(nextWord, neighbors.getOrDefault(nextWord, 0) + 1);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+    public static Map<String, Map<String, Integer>> buildGraph(String filePath) {
+        Map<String, Map<String, Integer>> graph = new HashMap<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line, str = "";
+            while ((line = br.readLine()) != null) {
+                line = line.replaceAll("[^a-zA-Z\\s]", " "); // 去除标点符号
+                line = line.toLowerCase(); // 转换为小写
+                str = str + line;
             }
-            return graph;
-        }
-
-        public static void showDirectedGraph(Map<String, Map<String, Integer>> graph) {
-            for (String node : graph.keySet()) {
-                System.out.print(node + " -> ");
-                Map<String, Integer> neighbors = graph.get(node);
-                for (String neighbor : neighbors.keySet()) {
-                    System.out.print(neighbor + " ");
-                }
-                System.out.println();
-            }
-        }
-
-
-        public static String generateDotGraph(Map<String, Map<String, Integer>> graph) {
-            StringBuilder dotGraphBuilder = new StringBuilder();
-            dotGraphBuilder.append("digraph G {\n");
-            for (String node : graph.keySet()) {
-
-                Map<String, Integer> neighbors = graph.get(node);
-                for (String neighbor : neighbors.keySet()) {
-                    dotGraphBuilder.append(node + " -> ");
-                    dotGraphBuilder.append(neighbor + " [label=" + neighbors.get(neighbor) + "] ;");
-                    dotGraphBuilder.append("\n");
-                }
-
-            }
-            // 读取文件并解析出有向图的边和节点z
-            dotGraphBuilder.append("}");
-            return dotGraphBuilder.toString();
-        }
-
-        // 将字符串表示的有向图保存到dot文件
-        public static void saveDotFile(String dotGraph, String dotFilePath) {
-            try (FileWriter writer = new FileWriter(dotFilePath)) {
-                writer.write(dotGraph);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        // 使用Graphviz生成图片
-        public static void generateImage(String dotFilePath, String imageFilePath) {
-            try {
-                // 执行Graphviz命令行
-                ProcessBuilder processBuilder = new ProcessBuilder("dot", "-Tpng", "-o", imageFilePath, dotFilePath);
-                Process process = processBuilder.start();
-                process.waitFor();
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public static String queryBridgeWords(String word1, String word2, Map<String, Map<String, Integer>> graph) {
-            StringBuilder result = new StringBuilder();
-
-            // 检查word1和word2是否存在于图中
-            if (!graph.containsKey(word1) || !graph.containsKey(word2)) {
-                return "No word1 or word2 in the graph!";
-            }
-
-            Map<String, Integer> word1Neighbors = graph.get(word1);
-
-            // 查找桥接词
-            boolean hasBridgeWords = false;
-            for (String bridgeWord : word1Neighbors.keySet()) {
-                if (graph.containsKey(bridgeWord) && graph.get(bridgeWord).containsKey(word2)) {
-                    result.append(bridgeWord).append(", ");
-                    hasBridgeWords = true;
-                }
-            }
-
-            if (!hasBridgeWords) {
-                return "No bridge words from \"" + word1 + "\" to \"" + word2 + "\"!";
-            } else {
-                result.insert(0, "The bridge words from \"" + word1 + "\" to \"" + word2 + "\" are: ");
-                result.setLength(result.length() - 2); // 移除最后的逗号和空格
-                result.append(".");
-                return result.toString();
-            }
-        }
-
-        public static String generateNewText(String text, Map<String, Map<String, Integer>> graph) {
-            if (text == null || text.trim().isEmpty()) {
-                return text; // 处理空文本情况
-            }
-
-            String[] words = text.split("\\s+");
-            if (words.length == 1) {
-                return text; // 处理只有一个单词的情况
-            }
-
-            StringBuilder modifiedText = new StringBuilder();
-            Random rand = new Random();
-
+            //System.out.println(str);
+            String[] words = str.split("\\s+"); // 拆分成单词
             for (int i = 0; i < words.length - 1; i++) {
-                modifiedText.append(words[i]).append(" ");
-                String bridgeWordResult = queryBridgeWords(words[i], words[i + 1], graph);
-
-                // 检查桥接词的格式
-                if (bridgeWordResult.startsWith("The bridge words")) {
-                    // 提取桥接词部分
-                    String bridgeWords = bridgeWordResult.substring(bridgeWordResult.indexOf(':') + 2, bridgeWordResult.length() - 1);
-                    String[] bridgeWordsArray = bridgeWords.split(", ");
-                    String selectedBridgeWord = bridgeWordsArray[rand.nextInt(bridgeWordsArray.length)];
-                    modifiedText.append(selectedBridgeWord).append(" ");
+                String currentWord = words[i];
+                String nextWord = words[i + 1];
+                if (!graph.containsKey(currentWord)) {
+                    graph.put(currentWord, new HashMap<>());
                 }
+                Map<String, Integer> neighbors = graph.get(currentWord);
+                neighbors.put(nextWord, neighbors.getOrDefault(nextWord, 0) + 1);
             }
-            modifiedText.append(words[words.length - 1]);
-
-            return modifiedText.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return graph;
+    }
+
+    public static void showDirectedGraph(Map<String, Map<String, Integer>> graph) {
+        for (String node : graph.keySet()) {
+            System.out.print(node + " -> ");
+            Map<String, Integer> neighbors = graph.get(node);
+            for (String neighbor : neighbors.keySet()) {
+                System.out.print(neighbor + " ");
+            }
+            System.out.println();
+        }
+    }
+
+
+    public static String generateDotGraph(Map<String, Map<String, Integer>> graph) {
+        StringBuilder dotGraphBuilder = new StringBuilder();
+        dotGraphBuilder.append("digraph G {\n");
+        for (String node : graph.keySet()) {
+
+            Map<String, Integer> neighbors = graph.get(node);
+            for (String neighbor : neighbors.keySet()) {
+                dotGraphBuilder.append(node + " -> ");
+                dotGraphBuilder.append(neighbor + " [label=" + neighbors.get(neighbor) + "] ;");
+                dotGraphBuilder.append("\n");
+            }
+
+        }
+        // 读取文件并解析出有向图的边和节点z
+        dotGraphBuilder.append("}");
+        return dotGraphBuilder.toString();
+    }
+
+    // 将字符串表示的有向图保存到dot文件
+    public static void saveDotFile(String dotGraph, String dotFilePath) {
+        try (FileWriter writer = new FileWriter(dotFilePath)) {
+            writer.write(dotGraph);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 使用Graphviz生成图片
+    public static void generateImage(String dotFilePath, String imageFilePath) {
+        try {
+            // 执行Graphviz命令行
+            ProcessBuilder processBuilder = new ProcessBuilder("dot", "-Tpng", "-o", imageFilePath, dotFilePath);
+            Process process = processBuilder.start();
+            process.waitFor();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String queryBridgeWords(String word1, String word2, Map<String, Map<String, Integer>> graph) {
+        StringBuilder result = new StringBuilder();
+
+        // 检查word1和word2是否存在于图中
+        if (!graph.containsKey(word1) || !graph.containsKey(word2)) {
+            return "No word1 or word2 in the graph!";
+        }
+
+        Map<String, Integer> word1Neighbors = graph.get(word1);
+
+        // 查找桥接词
+        boolean hasBridgeWords = false;
+        for (String bridgeWord : word1Neighbors.keySet()) {
+            if (graph.containsKey(bridgeWord) && graph.get(bridgeWord).containsKey(word2)) {
+                result.append(bridgeWord).append(", ");
+                hasBridgeWords = true;
+            }
+        }
+
+        if (!hasBridgeWords) {
+            return "No bridge words from \"" + word1 + "\" to \"" + word2 + "\"!";
+        } else {
+            result.insert(0, "The bridge words from \"" + word1 + "\" to \"" + word2 + "\" are: ");
+            result.setLength(result.length() - 2); // 移除最后的逗号和空格
+            result.append(".");
+            return result.toString();
+        }
+    }
+
+    public static String generateNewText(String text, Map<String, Map<String, Integer>> graph) {
+        if (text == null || text.trim().isEmpty()) {
+            return text; // 处理空文本情况
+        }
+
+        String[] words = text.split("\\s+");
+        if (words.length == 1) {
+            return text; // 处理只有一个单词的情况
+        }
+
+        StringBuilder modifiedText = new StringBuilder();
+        Random rand = new Random();
+
+        for (int i = 0; i < words.length - 1; i++) {
+            modifiedText.append(words[i]).append(" ");
+            String bridgeWordResult = queryBridgeWords(words[i], words[i + 1], graph);
+
+            // 检查桥接词的格式
+            if (bridgeWordResult.startsWith("The bridge words")) {
+                // 提取桥接词部分
+                String bridgeWords = bridgeWordResult.substring(bridgeWordResult.indexOf(':') + 2, bridgeWordResult.length() - 1);
+                String[] bridgeWordsArray = bridgeWords.split(", ");
+                String selectedBridgeWord = bridgeWordsArray[rand.nextInt(bridgeWordsArray.length)];
+                modifiedText.append(selectedBridgeWord).append(" ");
+            }
+        }
+        modifiedText.append(words[words.length - 1]);
+
+        return modifiedText.toString();
+    }
+    public static String calcShortestPathSingleWord(String word, Map<String, Map<String, Integer>> graph) {
+        if (!graph.containsKey(word)) {
+            return "The word is not in the graph!";
+        }
+
+        // 遍历图中的所有单词
+        StringBuilder result = new StringBuilder();
+        for (String targetWord : graph.keySet()) {
+            if (!targetWord.equals(word)) {
+                // 调用现有的 calcShortestPath 方法计算单源最短路径
+                String shortestPath = calcShortestPath(word, targetWord, graph);
+                result.append(shortestPath).append("\n");
+            }
+        }
+
+        // 移除最后一个换行符
+        if (result.length() > 0) {
+            result.setLength(result.length() - 1);
+        }
+
+        return result.toString();
+    }
     public static String calcShortestPath(String word1, String word2, Map<String, Map<String, Integer>> graph) {
         if (!graph.containsKey(word1) || !graph.containsKey(word2)) {
             return "One or both words are not in the graph!";
@@ -287,9 +323,6 @@ class Graph {
         String dotGraph = generateDotGraphWithHighlight(graph, path);
         String dotFilePath = "shortest_path.dot";
         saveDotFile(dotGraph, dotFilePath);
-        String imageFilePath = "shortest_path.png";
-        generateImage(dotFilePath, imageFilePath);
-        result.append("\nPath visualization saved as: ").append(imageFilePath);
 
         return result.toString();
     }
@@ -321,50 +354,54 @@ class Graph {
         return dotGraphBuilder.toString();
     }
 
-public static String randomWalk(Map<String, Map<String, Integer>> graph) {
-    if (graph.isEmpty()) {
-        return "Graph is empty!";
-    }
-
-    Random rand = new Random();
-    List<String> nodes = new ArrayList<>(graph.keySet());
-    String startNode = nodes.get(rand.nextInt(nodes.size()));
-
-    StringBuilder walkPath = new StringBuilder();
-    Set<String> visitedEdges = new HashSet<>();
-    String currentNode = startNode;
-
-    Scanner scanner = new Scanner(System.in);
-
-    while (true) {
-        walkPath.append(currentNode).append(" ");
-        Map<String, Integer> neighbors = graph.get(currentNode);
-
-        if (neighbors == null || neighbors.isEmpty()) {
-            break;
+    //    String calcShortestPath(String word1, String word2){
+//
+//    }
+//
+    public static String randomWalk(Map<String, Map<String, Integer>> graph) {
+        if (graph.isEmpty()) {
+            return "Graph is empty!";
         }
 
-        List<String> neighborList = new ArrayList<>(neighbors.keySet());
-        String nextNode = neighborList.get(rand.nextInt(neighborList.size()));
-        String edge = currentNode + "->" + nextNode;
+        Random rand = new Random();
+        List<String> nodes = new ArrayList<>(graph.keySet());
+        String startNode = nodes.get(rand.nextInt(nodes.size()));
 
-        if (visitedEdges.contains(edge)) {
-            break;
-        }
+        StringBuilder walkPath = new StringBuilder();
+        Set<String> visitedEdges = new HashSet<>();
+        String currentNode = startNode;
 
-        visitedEdges.add(edge);
-        currentNode = nextNode;
-        String userInput = scanner.nextLine();
-        if ("stop".equalsIgnoreCase(userInput)) {
-            break;
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            walkPath.append(currentNode).append(" ");
+            Map<String, Integer> neighbors = graph.get(currentNode);
+
+            if (neighbors == null || neighbors.isEmpty()) {
+                break;
+            }
+
+            List<String> neighborList = new ArrayList<>(neighbors.keySet());
+            String nextNode = neighborList.get(rand.nextInt(neighborList.size()));
+            String edge = currentNode + "->" + nextNode;
+
+            if (visitedEdges.contains(edge)) {
+                break;
+            }
+
+            visitedEdges.add(edge);
+            currentNode = nextNode;
+            String userInput = scanner.nextLine();
+            if ("stop".equalsIgnoreCase(userInput)) {
+                break;
+            }
         }
-    }
-    return walkPath.toString().trim();
+        return walkPath.toString().trim();
     }
 
     public static void writeToFile(String content, String fileName) throws IOException {
-            try (FileWriter writer = new FileWriter(fileName)) {
-                writer.write(content);
-            }
+        try (FileWriter writer = new FileWriter(fileName)) {
+            writer.write(content);
+        }
     }
 }
