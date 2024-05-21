@@ -7,7 +7,12 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        String filePath = "y.txt";
+        if (args.length < 1) {
+            System.err.println("请提供文件");
+            System.exit(1);
+        }
+
+        String filePath = args[0]; // 获取文件路径参数
         Map<String, Map<String, Integer>> graph = Graph.buildGraph(filePath);
 
         while (true) {
@@ -67,8 +72,14 @@ public class Main {
                         word2 = input;
                         // 用户输入了两个单词，调用现有的 calcShortestPath 方法
                         shortestPath = Graph.calcShortestPath(word1, word2, graph);
+                        String[] parts = shortestPath.split("\n");
+                        String paths = parts[1];
+                        List<String> path = List.of(paths.split(" -> "));
+                        // Optionally, you can also save this path visualization as a graph image using Graphviz
+                        String dotshortestGraph = Graph.generateDotGraphWithHighlight(graph, path);
                         String dotPath = "shortest_path.dot";
                         String imagePath = "shortest_path.png";
+                        Graph.saveDotFile(dotshortestGraph, dotPath);
                         Graph.generateImage(dotPath, imagePath);
 
                     }
@@ -127,8 +138,8 @@ class Graph {
         for (String node : graph.keySet()) {
             System.out.print(node + " -> ");
             Map<String, Integer> neighbors = graph.get(node);
-            for (String neighbor : neighbors.keySet()) {
-                System.out.print(neighbor + " ");
+            for (Map.Entry<String, Integer> entry : neighbors.entrySet()) {
+                System.out.print(entry.getKey() + "(" + entry.getValue() + ") ");
             }
             System.out.println();
         }
@@ -318,16 +329,10 @@ class Graph {
         result.append("The shortest path from \"").append(word1).append("\" to \"").append(word2).append("\" is:\n");
         result.append(String.join(" -> ", path));
         result.append("\nPath length: ").append(distances.get(word2));
-
-        // Optionally, you can also save this path visualization as a graph image using Graphviz
-        String dotGraph = generateDotGraphWithHighlight(graph, path);
-        String dotFilePath = "shortest_path.dot";
-        saveDotFile(dotGraph, dotFilePath);
-
         return result.toString();
     }
 
-    private static String generateDotGraphWithHighlight(Map<String, Map<String, Integer>> graph, List<String> path) {
+    public static String generateDotGraphWithHighlight(Map<String, Map<String, Integer>> graph, List<String> path) {
         StringBuilder dotGraphBuilder = new StringBuilder();
         dotGraphBuilder.append("digraph G {\n");
 
