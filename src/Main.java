@@ -305,7 +305,7 @@ class Graph {
                 }
 
                 int newDist = distances.get(closestNode) + neighbor.getValue();
-                System.out.println(closestNode + "->" + neighbor.getKey() + " " + newDist);
+                //System.out.println(closestNode + "->" + neighbor.getKey() + " " + newDist);
                 if (distances.containsKey(neighbor.getKey()) && newDist < distances.get(neighbor.getKey())) {
                     distances.put(neighbor.getKey(), newDist);
                     previousNodes.put(neighbor.getKey(), closestNode);
@@ -324,7 +324,6 @@ class Graph {
             path.add(at);
         }
         Collections.reverse(path);
-
         StringBuilder result = new StringBuilder();
         result.append("The shortest path from \"").append(word1).append("\" to \"").append(word2).append("\" is:\n");
         result.append(String.join(" -> ", path));

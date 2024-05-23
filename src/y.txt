@@ -1,2 +1,4 @@
-To @ explore strange new worlds,
-To seek out new life and new civilizations?
+A test case is a detailed procedure that fully tests a feature or an aspect of a feature.
+Whereas the test plan describes what to test, a test case describes how to perform a particular test.
+You need to develop a test case for each test listed in the test plan.
+Figure illustrates the point at which test case design occurs in the lab development and testing process
