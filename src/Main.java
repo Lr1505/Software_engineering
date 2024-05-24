@@ -46,14 +46,17 @@ public class Main {
                 case 2:
                     System.out.print("Enter word1: ");
                     String word1 = scanner.nextLine();
+                    word1=word1.toLowerCase();
                     System.out.print("Enter word2: ");
                     String word2 = scanner.nextLine();
+                    word1=word1.toLowerCase();
                     String bridgeWords = Graph.queryBridgeWords(word1, word2, graph);
                     System.out.println(bridgeWords);
                     break;
                 case 3:
                     System.out.println("Enter your text:");
                     String inputText = scanner.nextLine();
+                    inputText=inputText.toLowerCase();
                     String outputText = Graph.generateNewText(inputText, graph);
                     System.out.println("Modified text with bridge words:");
                     System.out.println(outputText);;
@@ -61,15 +64,16 @@ public class Main {
                 case 4:
                     System.out.print("Enter the first word: ");
                     word1 = scanner.nextLine();
+                    word1=word1.toLowerCase();
                     System.out.print("Enter the second word (or press Enter to calculate paths from the first word to all others): ");
                     String input = scanner.nextLine();
                     String shortestPath;
 
-                    if (input.isEmpty()) {
+                    if (input.isEmpty() ||word1.equals(input.toLowerCase())) {
                         // 用户只输入了一个单词，调用新的 calcShortestPathSingleWord 方法
                         shortestPath = Graph.calcShortestPathSingleWord(word1, graph);
                     } else {
-                        word2 = input;
+                        word2 = input.toLowerCase();
                         // 用户输入了两个单词，调用现有的 calcShortestPath 方法
                         shortestPath = Graph.calcShortestPath(word1, word2, graph);
                         String[] parts = shortestPath.split("\n");
@@ -219,7 +223,7 @@ class Graph {
             return text; // 处理空文本情况
         }
 
-        String[] words = text.split("\\s+");
+        String[] words = text.replaceAll("[^a-zA-Z\\s]", " ").split("\\s+"); ;
         if (words.length == 1) {
             return text; // 处理只有一个单词的情况
         }
