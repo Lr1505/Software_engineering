@@ -43,7 +43,7 @@ public class Main {
 
                     System.out.println("Graph visualization saved as: " + imageFilePath);
                     break;
-                case 2:
+                case 2://查询桥接词
                     System.out.print("Enter word1: ");
                     String word1 = scanner.nextLine();
                     word1=word1.toLowerCase();
@@ -53,7 +53,7 @@ public class Main {
                     String bridgeWords = Graph.queryBridgeWords(word1, word2, graph);
                     System.out.println(bridgeWords);
                     break;
-                case 3:
+                case 3://生成新文本
                     System.out.println("Enter your text:");
                     String inputText = scanner.nextLine();
                     inputText=inputText.toLowerCase();
@@ -61,7 +61,7 @@ public class Main {
                     System.out.println("Modified text with bridge words:");
                     System.out.println(outputText);;
                     break;
-                case 4:
+                case 4://计算最短路径
                     System.out.print("Enter the first word: ");
                     word1 = scanner.nextLine();
                     word1=word1.toLowerCase();
@@ -91,7 +91,7 @@ public class Main {
                     System.out.println(shortestPath);
                     break;
                 case 5:
-                    System.out.println("Starting random walk...");
+                    System.out.println("Starting random walk...");//随机游走
                     System.out.println("Press Enter to continue or type 'stop' to end:");
                     String walkResult = Graph.randomWalk(graph);
                     System.out.println("Random walk result:");
@@ -112,7 +112,7 @@ public class Main {
 
 
 class Graph {
-    public static Map<String, Map<String, Integer>> buildGraph(String filePath) {
+    public static Map<String, Map<String, Integer>> buildGraph(String filePath) {//读取文件并构建图
         Map<String, Map<String, Integer>> graph = new HashMap<>();
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line, str = "";
