@@ -123,7 +123,7 @@ class Graph {
             }
             //System.out.println(str);
             String[] words = str.split("\\s+"); // 拆分成单词
-            for (int i = 0; i < words.length - 1; i++) {
+            for (int i = 0; i < words.length - 2; i++) {
                 String currentWord = words[i];
                 String nextWord = words[i + 1];
                 if (!graph.containsKey(currentWord)) {
@@ -132,6 +132,11 @@ class Graph {
                 Map<String, Integer> neighbors = graph.get(currentWord);
                 neighbors.put(nextWord, neighbors.getOrDefault(nextWord, 0) + 1);
             }
+            String currentWord = words[words.length-1];
+            if (!graph.containsKey(currentWord)) {
+                graph.put(currentWord, new HashMap<>());
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -140,10 +145,10 @@ class Graph {
 
     public static void showDirectedGraph(Map<String, Map<String, Integer>> graph) {
         for (String node : graph.keySet()) {
-            System.out.print(node + " -> ");
+            System.out.print(node);
             Map<String, Integer> neighbors = graph.get(node);
             for (Map.Entry<String, Integer> entry : neighbors.entrySet()) {
-                System.out.print(entry.getKey() + "(" + entry.getValue() + ") ");
+                System.out.print(" -> "+entry.getKey() + "(" + entry.getValue() + ") ");
             }
             System.out.println();
         }
@@ -191,7 +196,6 @@ class Graph {
 
     public static String queryBridgeWords(String word1, String word2, Map<String, Map<String, Integer>> graph) {
         StringBuilder result = new StringBuilder();
-
         // 检查word1和word2是否存在于图中
         if (!graph.containsKey(word1) || !graph.containsKey(word2)) {
             return "No word1 or word2 in the graph!";
