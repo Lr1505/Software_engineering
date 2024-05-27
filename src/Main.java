@@ -144,6 +144,7 @@ class Graph {
     }
 
     public static void showDirectedGraph(Map<String, Map<String, Integer>> graph) {
+        // 打印有向图
         for (String node : graph.keySet()) {
             if (!graph.get(node).isEmpty()) {
                 System.out.print(node + "->");
@@ -162,6 +163,7 @@ class Graph {
 
 
     public static String generateDotGraph(Map<String, Map<String, Integer>> graph) {
+        // 生成Dot语言描述的有向图
         StringBuilder dotGraphBuilder = new StringBuilder();
         dotGraphBuilder.append("digraph G {\n");
         for (String node : graph.keySet()) {
