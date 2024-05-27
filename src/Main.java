@@ -72,7 +72,7 @@ public class Main {
                     if (input.isEmpty() ||word1.equals(input.toLowerCase())) {
                         // 用户只输入了一个单词，调用新的 calcShortestPathSingleWord 方法
                         shortestPath = Graph.calcShortestPathSingleWord(word1, graph);
-                    } else {
+                    } else {// 用户输入了两个单词，调用现有的 calcShortestPath 方法
                         word2 = input.toLowerCase();
                         // 用户输入了两个单词，调用现有的 calcShortestPath 方法
                         shortestPath = Graph.calcShortestPath(word1, word2, graph);
