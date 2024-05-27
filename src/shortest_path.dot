@@ -1,4 +1,4 @@
-digraph G {
+digraph G {//最短路径图
 illustrates -> the [label=1];
 for -> each [label=1];
 occurs -> in [label=1];
