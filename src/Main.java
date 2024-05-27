@@ -25,7 +25,7 @@ public class Main {
             Scanner scanner = new Scanner(System.in);
             int choice = scanner.nextInt();
             scanner.nextLine();
-            switch (choice) {
+            switch (choice) {//menu
                 case 0:
                     return;
                 case 1:
