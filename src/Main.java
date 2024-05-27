@@ -123,7 +123,7 @@ class Graph {
             }
             //System.out.println(str);
             String[] words = str.split("\\s+"); // 拆分成单词
-            for (int i = 0; i < words.length - 2; i++) {
+            for (int i = 0; i < words.length - 1; i++) {
                 String currentWord = words[i];
                 String nextWord = words[i + 1];
                 if (!graph.containsKey(currentWord)) {
@@ -145,12 +145,18 @@ class Graph {
 
     public static void showDirectedGraph(Map<String, Map<String, Integer>> graph) {
         for (String node : graph.keySet()) {
-            System.out.print(node);
-            Map<String, Integer> neighbors = graph.get(node);
-            for (Map.Entry<String, Integer> entry : neighbors.entrySet()) {
-                System.out.print(" -> "+entry.getKey() + "(" + entry.getValue() + ") ");
+            if (!graph.get(node).isEmpty()) {
+                System.out.print(node + "->");
+                Map<String, Integer> neighbors = graph.get(node);
+                for (Map.Entry<String, Integer> entry : neighbors.entrySet()) {
+                    System.out.print(entry.getKey() + "(" + entry.getValue() + ") ");
+                }
+                System.out.println();
             }
-            System.out.println();
+            else {
+                System.out.print(node);
+                System.out.println();
+            }
         }
     }
 
