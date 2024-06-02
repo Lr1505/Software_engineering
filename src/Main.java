@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.io.File;
 import java.util.*;
 
+//运行
+//javac -encoding UTF-8 Main.java
+//java Main y.txt
+
 public class Main {
     public static void main(String[] args) {
         if (args.length < 1) {
