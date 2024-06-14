@@ -1,1 +1,1 @@
-describes what to develop a feature whereas the lab development
+tests a detailed procedure that fully tests
