@@ -107,8 +107,8 @@ public class Main {
           word1 = scanner.nextLine();
           word1 = word1.toLowerCase();
           System.out.print(
-              "Enter the second word "
-                  + "(or press Enter to calculate paths from the first word to all others): ");
+                  "Enter the second word "
+                          + "(or press Enter to calculate paths from the first word to all others): ");
           String input = scanner.nextLine();
           String shortestPath;
 
@@ -160,7 +160,7 @@ public class Main {
     public static Map<String, Map<String, Integer>> buildGraph(String filePath) {
       Map<String, Map<String, Integer>> graph = new HashMap<>();
       try (BufferedReader br = new BufferedReader(
-          new FileReader(filePath, StandardCharsets.UTF_8))) {
+              new FileReader(filePath, StandardCharsets.UTF_8))) {
         StringBuilder str = new StringBuilder(); // 使用 StringBuilder 替代字符串连接
         String line;
         while ((line = br.readLine()) != null) {
@@ -241,7 +241,7 @@ public class Main {
       try {
         // 执行Graphviz命令行
         ProcessBuilder processBuilder = new ProcessBuilder("dot", "-Tpng", "-o", imageFilePath,
-            dotFilePath);
+                dotFilePath);
         Process process = processBuilder.start();
         process.waitFor();
       } catch (IOException | InterruptedException e) {
@@ -250,7 +250,7 @@ public class Main {
     }
 
     public static String queryBridgeWords(String word1, String word2,
-        Map<String, Map<String, Integer>> graph) {
+                                          Map<String, Map<String, Integer>> graph) {
       StringBuilder result = new StringBuilder();
       // 检查word1和word2是否存在于图中
       if (!graph.containsKey(word1) || !graph.containsKey(word2)) {
@@ -262,7 +262,7 @@ public class Main {
       // 查找桥接词
       boolean hasBridgeWords = false;
       for (String bridgeWord : word1Neighbors.keySet()) {
-        if (graph.containsKey(bridgeWord) && graph.get(bridgeWord).containsKey(word2)) {
+        if (graph.get(bridgeWord).containsKey(word2)) {
           result.append(bridgeWord).append(", ");
           hasBridgeWords = true;
         }
@@ -300,7 +300,7 @@ public class Main {
         if (bridgeWordResult.startsWith("The bridge words")) {
           // 提取桥接词部分
           String bridgeWords = bridgeWordResult.substring(bridgeWordResult.indexOf(':') + 2,
-              bridgeWordResult.length() - 1);
+                  bridgeWordResult.length() - 1);
           String[] bridgeWordsArray = bridgeWords.split(", ");
           String selectedBridgeWord = bridgeWordsArray[rand.nextInt(bridgeWordsArray.length)];
           modifiedText.append(selectedBridgeWord).append(" ");
@@ -312,7 +312,7 @@ public class Main {
     }
 
     public static String calcShortestPathSingleWord(String word,
-        Map<String, Map<String, Integer>> graph) {
+                                                    Map<String, Map<String, Integer>> graph) {
       if (!graph.containsKey(word)) {
         return "The word is not in the graph!";
       }
@@ -336,7 +336,7 @@ public class Main {
     }
 
     public static String calcShortestPath(String word1, String word2,
-        Map<String, Map<String, Integer>> graph) {
+                                          Map<String, Map<String, Integer>> graph) {
       if (!graph.containsKey(word1) || !graph.containsKey(word2)) {
         return "One or both words are not in the graph!";
       }
@@ -376,8 +376,7 @@ public class Main {
 
           int newDist = distances.get(closestNode) + neighbor.getValue();
           //System.out.println(closestNode + "->" + neighbor.getKey() + " " + newDist);
-          if (distances.containsKey(neighbor.getKey()) && newDist < distances.get(
-              neighbor.getKey())) {
+          if (newDist < distances.get(neighbor.getKey())) {
             distances.put(neighbor.getKey(), newDist);
             previousNodes.put(neighbor.getKey(), closestNode);
             nodes.remove(neighbor.getKey());
@@ -397,14 +396,14 @@ public class Main {
       Collections.reverse(path);
       StringBuilder result = new StringBuilder();
       result.append("The shortest path from \"").append(word1).append("\" to \"").append(word2)
-          .append("\" is:\n");
+              .append("\" is:\n");
       result.append(String.join(" -> ", path));
       result.append("\nPath length: ").append(distances.get(word2));
       return result.toString();
     }
 
     public static String generateDotGraphWithHighlight(Map<String, Map<String, Integer>> graph,
-        List<String> path) {
+                                                       List<String> path) {
       StringBuilder dotGraphBuilder = new StringBuilder();
       dotGraphBuilder.append("digraph G {\n");
 
@@ -422,7 +421,7 @@ public class Main {
           dotGraphBuilder.append(node).append(" -> ").append(neighbor);
           if (pathEdges.contains(edge)) {
             dotGraphBuilder.append(" [label=").append(neighborEntry.getValue())
-                .append(", color=red, penwidth=2.0]");
+                    .append(", color=red, penwidth=2.0]");
           } else {
             dotGraphBuilder.append(" [label=").append(neighborEntry.getValue()).append("]");
           }
